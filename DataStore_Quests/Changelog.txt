@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2023.12.10 (10/12/2023)
+
+- Added weekly world bosses.
+
 Version 2023.11.31 (31/11/2023)
 
 - Now checking the turn-in of daily quests for WotLK also.

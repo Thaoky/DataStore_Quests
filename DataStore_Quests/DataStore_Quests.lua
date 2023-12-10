@@ -107,6 +107,15 @@ local weeklyWorldQuests = {
 	[61816] = true,		-- Maldraxxus - Mortanis
 	[64531] = true,		-- The Maw - Mor'geth
 	[65143] = true,		-- Zereth Mortis - Antros
+	
+	-- Dragonflight : https://www.wowhead.com/guide/world-bosses-dragonflight
+	[69927] = true,		-- The Azure Span - Bazual
+	[69928] = true,		-- Thaldraszus - Liskanoth
+	[69929] = true,		-- Ohn'ahran Plains - Strunraan
+	[69930] = true,		-- The Waking Shores - Basrikron
+	-- [] = true,		-- Zaralek Cavern - The Zaqali Elders ?
+	[76367] = true,		-- Emerald Dream - Aurostor 
+	
 }
 
 local covenantCampaignIDs = {

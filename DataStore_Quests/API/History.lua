@@ -118,8 +118,6 @@ end)
 DataStore:OnPlayerLogin(function()
 	options = DataStore_Quests_Options
 	
-	options.AutoUpdateHistory = options.AutoUpdateHistory or true		-- if history has been queried at least once, auto update it at logon (fast operation - already in the game's cache)
-
 	if options.AutoUpdateHistory then			-- if history has been queried at least once, auto update it at logon (fast operation - already in the game's cache)
 		C_Timer.After(5, RefreshQuestHistory)	-- refresh quest history 5 seconds later, to decrease the load at startup
 	end

@@ -72,17 +72,17 @@ local function OnQuestTurnedIn(event, questID, xpReward, moneyReward)
 end
 
 -- ** Mixins **
-local function _GetWeekliesHistory(character)
-	return character
+local function _GetWeekliesHistory(characterID)
+	return weeklies[characterID]
 end
 
-local function _GetWeekliesHistorySize(character)
-	return character and #character or 0
+local function _GetWeekliesHistorySize(characterID)
+	return weeklies[characterID] and #weeklies[characterID] or 0
 end
 
-local function _GetWeekliesHistoryInfo(character, index)
-	if character then
-		local quest = character[index]
+local function _GetWeekliesHistoryInfo(characterID, index)
+	if weeklies[characterID] then
+		local quest = weeklies[characterID][index]
 		return quest.id, quest.title, quest.timestamp
 	end
 end

@@ -549,9 +549,11 @@ local function _IsCharacterOnQuest(character, questID)
 	
 	-- Callings will be empty for non-retail, we can leave it as is.
 	-- If not in the quest log, it may be a Calling (even not yet accepted and not yet in the quest log)
-	for callingQuestID, _ in pairs(character.Callings) do
-		if questID == callingQuestID then
-			return true, nil
+	if character.Callings then
+		for callingQuestID, _ in pairs(character.Callings) do
+			if questID == callingQuestID then
+				return true, nil
+			end
 		end
 	end
 end
@@ -656,9 +658,11 @@ DataStore:OnAddonLoaded(addonName, function()
 end)
 
 DataStore:OnPlayerLogin(function()
-	options = DataStore_Quests_Options
-	options.TrackTurnIns = options.TrackTurnIns or true					-- by default, save the ids of completed quests in the history
-	options.DailyResetHour = options.DailyResetHour or 3					-- Reset dailies at 3am (default value)
+	options = DataStore:SetDefaults("DataStore_Quests_Options", {
+		AutoUpdateHistory = true,	-- if history has been queried at least once, auto update it at logon (fast operation - already in the game's cache)
+		TrackTurnIns = true,			-- by default, save the ids of completed quests in the history
+		DailyResetHour = 3,			-- Reset dailies at 3am (default value)
+	})
 
 	addon:ListenTo("PLAYER_ALIVE", OnPlayerAlive)
 	addon:ListenTo("UNIT_QUEST_LOG_CHANGED", OnUnitQuestLogChanged)

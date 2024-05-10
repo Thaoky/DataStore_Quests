@@ -10,7 +10,7 @@ local options
 local DataStore, pairs, time, date, TableInsert, TableRemove = DataStore, pairs, time, date, table.insert, table.remove
 local C_DateAndTime, GetQuestID = C_DateAndTime, GetQuestID
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
-local isWotLK = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC)
+local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
 
 local function InsertQuest(questID, title)
 	local charID = DataStore.ThisCharID
@@ -26,17 +26,17 @@ local function InsertQuest(questID, title)
 end
 
 -- ** Mixins **
-local function _GetDailiesHistory(character)
-	return character
+local function _GetDailiesHistory(characterID)
+	return dailies[characterID]
 end
 
-local function _GetDailiesHistorySize(character)
-	return character and #character or 0
+local function _GetDailiesHistorySize(characterID)
+	return dailies[characterID] and #dailies[characterID] or 0
 end
 
-local function _GetDailiesHistoryInfo(character, index)
-	if character then
-		local quest = character[index]
+local function _GetDailiesHistoryInfo(characterID, index)
+	if dailies[characterID] then
+		local quest = dailies[characterID][index]
 		return quest.id, quest.title, quest.timestamp
 	end
 end
@@ -106,7 +106,7 @@ hooksecurefunc("GetQuestReward", function(choiceIndex)
 	-- 2019/09/09 : questID is valid, even in Classic
 	local questID = GetQuestID() -- returns the last displayed quest dialog's questID
 
-	if options.TrackTurnIns and questID and (isRetail or isWotLK) then
+	if options.TrackTurnIns and questID and (isRetail or isCata) then
 
 		-- track daily quests turn-ins
 		if QuestIsDaily() or DataStore:IsEmissaryQuest(questID) then

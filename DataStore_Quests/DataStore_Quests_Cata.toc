@@ -1,4 +1,4 @@
-## Interface: 100207
+## Interface: 40400
 ## Title: DataStore_Quests
 ## IconTexture: Interface\Icons\garrison_building_storehouse
 
@@ -13,6 +13,5 @@ locale.xml
 
 DataStore_Quests.lua
 API\History.lua
-API\Progress.lua
 API\Dailies.lua
-API\Weeklies.lua
+Options.xml

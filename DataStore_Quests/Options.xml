@@ -4,7 +4,7 @@
 	<Frame parentKey="QuestsOptions" parent="DataStoreFrames" hidden="true">
 		<Size x="615" y="306" />
 		<KeyValues>
-			<KeyValue key="module" value="DataStore_Quests_Options" />
+			<KeyValue key="module" value="DataStore_Quests" />
 		</KeyValues>
 		<Layers>
 			<Layer level="OVERLAY">

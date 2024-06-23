@@ -10,6 +10,7 @@ local thisCharacter
 local allCharacters
 local questInfos
 local questColors
+local questTitles
 local options
 
 local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
@@ -93,12 +94,17 @@ else
 end
 
 -- *** Utility functions ***
+local function GetQuestTitle(questID)
+	return isRetail and C_QuestLog.GetTitleForQuestID(questID) or questTitles[questID]
+end
+
+
 local function SetQuestInfo(questID, isDaily, isWeekly, isTask, isBounty, isStory, isHidden, isSolo, groupSize, level)
 
 	local link = GetQuestLink and GetQuestLink(questID)
 	if not link then return end
 
-	local inputString = "|cffffff00|Hquest:76317:2699|h[Call of the Dream]|h|r"
+	-- local inputString = "|cffffff00|Hquest:76317:2699|h[Call of the Dream]|h|r"
 
 	local color, _, questInfo = link:match("|c(%x+)|Hquest:(%d+):(%d+)|h")
 	local colorID = DataStore:StoreToSetAndList(questColors, color)
@@ -124,7 +130,7 @@ local function BuildQuestLink(questID)
 	local data = questInfos[questID]
 	if not data then return end
 	
-	local title = C_QuestLog.GetTitleForQuestID(questID)
+	local title = GetQuestTitle(questID)
 	if not title then return end
 	
 	local color = bit64:GetBits(data, 0, 4)
@@ -178,9 +184,15 @@ local function GetQuestTagID(questID, isComplete)
 	end
 
 	-- needs checking, this does not apply to retail
-	if isComplete and isComplete ~= 0 then
-		return (isComplete < 0) and "FAILED" or "COMPLETED"
+	-- old version was always nil in retail
+	-- if isComplete and isComplete ~= 0 then
+		-- return (isComplete < 0) and "FAILED" or "COMPLETED"
+	-- end
+	
+	if isComplete then
+		return "COMPLETED"
 	end
+	
 
 	-- at this point, isComplete is either nil or 0
 	if bit64:TestBit(data, 14) then return "DAILY" end		-- isDaily ?
@@ -339,6 +351,10 @@ local function ScanQuests()
 			
 			TableInsert(quests, value)
 			lastQuestIndex = lastQuestIndex + 1
+			
+			if not isRetail then
+				questTitles[questID] = title
+			end
 
 			SetQuestInfo(questID,
 				(frequency == API_DailyFrequency) and 1 or 0,
@@ -455,7 +471,7 @@ local function _GetQuestGroupSize(questID)
 end
 
 local function _GetQuestName(questID)
-	return C_QuestLog.GetTitleForQuestID(questID) or "querying.."
+	return GetQuestTitle(questID) or "querying.."
 end
 
 local function _GetQuestLevel(questID)
@@ -650,6 +666,12 @@ DataStore:OnAddonLoaded(addonName, function()
 	thisCharacter.QuestHeaders = thisCharacter.QuestHeaders or {}
 	thisCharacter.Rewards = thisCharacter.Rewards or {}
 	thisCharacter.Emissaries = thisCharacter.Emissaries or {}
+	
+	-- Quest titles cannot be retrieved with C_QuestLog in Cataclym
+	if not isRetail then
+		DataStore_Quests_Titles = DataStore_Quests_Titles or {}
+		questTitles = DataStore_Quests_Titles
+	end
 		
 	allCharacters = DataStore_Quests_Characters
 	questInfos = DataStore_Quests_Infos

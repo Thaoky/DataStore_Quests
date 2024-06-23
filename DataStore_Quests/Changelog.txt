@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2024.06.23 (06/23/2024)
+
+- Several fixes for Cataclysm
+
 Version 2024.05.20 (05/20/2024)
 
 - Stopped using Ace libraries

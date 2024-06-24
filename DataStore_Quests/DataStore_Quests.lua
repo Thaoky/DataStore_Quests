@@ -105,10 +105,17 @@ local function SetQuestInfo(questID, isDaily, isWeekly, isTask, isBounty, isStor
 	if not link then return end
 
 	-- local inputString = "|cffffff00|Hquest:76317:2699|h[Call of the Dream]|h|r"
-
-	local color, _, questInfo = link:match("|c(%x+)|Hquest:(%d+):(%d+)|h")
+	local color, _, questInfo = link:match("|c(%x+)|Hquest:(%d+):(-?%d+)|h")
+	
 	local colorID = DataStore:StoreToSetAndList(questColors, color)
 	questInfo = tonumber(questInfo)
+	
+	-- 2024/06/24 : Fix for Cataclysm, not sure yet if it applies to Retail
+	-- questInfo can be equal to -1 for quests that seem to have no level (like holiday quests)
+	-- Set it to 0, and adjust when rebuilding the link
+	if questInfo < 0 then
+		questInfo = 0
+	end
 	
 	local tagID = API_GetQuestTagInfo(questID) or 0
 
@@ -135,6 +142,13 @@ local function BuildQuestLink(questID)
 	
 	local color = bit64:GetBits(data, 0, 4)
 	local info = bit64:RightShift(data, 32)
+	
+	-- 2024/06/24 : Fix for Cataclysm, not sure yet if it applies to Retail
+	-- questInfo can be equal to -1 for quests that seem to have no level (like holiday quests)
+	-- Set it to 0, and adjust when rebuilding the link
+	if info == 0 then
+		info = -1
+	end
 	
 	-- Ex: "|cffffff00|Hquest:65436:2573|h[The Dragon Isles Await]|h|r"
 	return format("|c%s|Hquest:%d:%d|h[%s]|h|r", color, questID, info, title)

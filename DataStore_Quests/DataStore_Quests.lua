@@ -95,7 +95,11 @@ end
 
 -- *** Utility functions ***
 local function GetQuestTitle(questID)
-	return isRetail and C_QuestLog.GetTitleForQuestID(questID) or questTitles[questID]
+	-- retail
+	if isRetail then return C_QuestLog.GetTitleForQuestID(questID) end
+	
+	-- non-retail
+	if questTitles then return questTitles[questID] end
 end
 
 

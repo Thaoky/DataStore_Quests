@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 50500
 ## Title: DataStore_Quests
 ## IconTexture: Interface\Icons\garrison_building_storehouse
 
@@ -6,13 +6,12 @@
 ## Author: Thaoky (EU-Marécages de Zangar)
 ## Version: 2025.08.21
 ## Dependencies: AddonFactory, DataStore
-## SavedVariables: DataStore_Quests_Characters, DataStore_Quests_History, DataStore_Quests_Progress, DataStore_Quests_Dailies, DataStore_Quests_Weeklies, DataStore_Quests_Colors, DataStore_Quests_Infos, DataStore_Quests_Options
+## SavedVariables: DataStore_Quests_Characters, DataStore_Quests_History, DataStore_Quests_Progress, DataStore_Quests_Dailies, DataStore_Quests_Weeklies, DataStore_Quests_Colors, DataStore_Quests_Infos, DataStore_Quests_Titles, DataStore_Quests_Options
 ## X-Category: Interface Enhancements
 
 locale.xml
 
 DataStore_Quests.lua
 API\History.lua
-API\Progress.lua
 API\Dailies.lua
-API\Weeklies.lua
+Options.xml

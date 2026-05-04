@@ -66,11 +66,11 @@ local API_GetQuestTagInfo
 if isRetail then
 	API_GetQuestInfo = function(index) 
 			local info = C_QuestLog.GetInfo(index)
-		
+			if not info then return nil end
 			-- isComplete : always nil in retail ? needs checking
 		
-			return info.title, info.level, info.groupSize, info.isHeader, info.isCollapsed, info.isComplete, 
-				info.frequency or 0, info.questID, info.isTask, info.isBounty, info.isStory, info.isHidden, info.suggestedGroup			
+			return info.title, info.level, info.groupSize, info.isHeader, info.isCollapsed, info.isComplete,
+				info.frequency or 0, info.questID, info.isTask, info.isBounty, info.isStory, info.isHidden, info.suggestedGroup
 		end
 	API_GetQuestTagInfo = function(questID)
 			local info = C_QuestLog.GetQuestTagInfo(questID) or {}
@@ -78,14 +78,14 @@ if isRetail then
 		end
 else
 	API_GetQuestInfo = function(index) 
-			local title, level, groupSize, isHeader, isCollapsed, isComplete, frequency, questID, 
+			local title, level, groupSize, isHeader, isCollapsed, isComplete, frequency, questID,
 					_, _, _, _, isTask, isBounty, isStory, isHidden = GetQuestLogTitle(index)
 			
 			-- isComplete : 1 if the quest is completed, -1 if the quest is failed, nil otherwise
 			
 			-- 2019/09/01 groupSize = "Dungeon", "Raid" in Classic, not numeric !! => 0
 			-- temporary fix: set it to 0 (3rd return value)
-			return title, level, 0, isHeader, isCollapsed, isComplete, 
+			return title, level, 0, isHeader, isCollapsed, isComplete,
 					frequency, questID, isTask, isBounty, isStory, isHidden, 0
 		end
 	API_GetQuestTagInfo = function(questID)
@@ -354,50 +354,51 @@ local function ScanQuests()
 
 		local title, level, groupSize, isHeader, isCollapsed, isComplete, 
 				frequency, questID, isTask, isBounty, isStory, isHidden, suggestedGroup	= API_GetQuestInfo(i)
-		
-		if isHeader then
-			TableInsert(headers, title or "")
-			lastHeaderIndex = lastHeaderIndex + 1
-		else
-			API_SetSelectedQuest(isRetail and questID or i)
-			
-			local value = (isComplete and isComplete > 0) and 1 or 0		-- bit 0 : isComplete
-			value = value 
-					+ bit64:LeftShift(lastHeaderIndex, 1)						-- bits 1-5 : index of the header (zone) to which this quest belongs
-					+ bit64:LeftShift(questID, 6)									-- bits 6-23 : questID
-					+ bit64:LeftShift(GetQuestLogRewardMoney(), 24)			-- bits 24+ : money
-			
-			TableInsert(quests, value)
-			lastQuestIndex = lastQuestIndex + 1
-			
-			if not isRetail then
-				questTitles[questID] = title
-			end
+		if title then -- Blizzard sometimes returns nil for quest info. Assume a quest without a title means no information is available
+			if isHeader then
+				TableInsert(headers, title or "")
+				lastHeaderIndex = lastHeaderIndex + 1
+			else
+				API_SetSelectedQuest(isRetail and questID or i)
+				
+				local value = (isComplete and isComplete > 0) and 1 or 0		-- bit 0 : isComplete
+				value = value 
+						+ bit64:LeftShift(lastHeaderIndex, 1)						-- bits 1-5 : index of the header (zone) to which this quest belongs
+						+ bit64:LeftShift(questID, 6)									-- bits 6-23 : questID
+						+ bit64:LeftShift(GetQuestLogRewardMoney(), 24)			-- bits 24+ : money
+				
+				TableInsert(quests, value)
+				lastQuestIndex = lastQuestIndex + 1
+				
+				if not isRetail then
+					questTitles[questID] = title
+				end
 
-			SetQuestInfo(questID,
-				(frequency == API_DailyFrequency) and 1 or 0,
-				(frequency == API_WeeklyFrequency) and 1 or 0,
-				isTask and 1 or 0,
-				isBounty and 1 or 0,
-				isStory and 1 or 0,
-				isHidden and 1 or 0,
-				(groupSize == 0) and 1 or 0,
-				suggestedGroup, level)
+				SetQuestInfo(questID,
+					(frequency == API_DailyFrequency) and 1 or 0,
+					(frequency == API_WeeklyFrequency) and 1 or 0,
+					isTask and 1 or 0,
+					isBounty and 1 or 0,
+					isStory and 1 or 0,
+					isHidden and 1 or 0,
+					(groupSize == 0) and 1 or 0,
+					suggestedGroup, level)
 
-			-- is the quest an emissary quest ?
-			-- Note: this will also process callings, since they were injected earlier
-			if emissaryQuests[questID] then
-				local objective, _, _, numFulfilled, numRequired = GetQuestObjectiveInfo(questID, 1, false)
-				emissaries[questID] = format("%d|%d|%d|%s|%d|%s", numFulfilled, numRequired, C_TaskQuest.GetQuestTimeLeftMinutes(questID), objective or "", time(), title)
-			end
+				-- is the quest an emissary quest ?
+				-- Note: this will also process callings, since they were injected earlier
+				if emissaryQuests[questID] then
+					local objective, _, _, numFulfilled, numRequired = GetQuestObjectiveInfo(questID, 1, false)
+					emissaries[questID] = format("%d|%d|%d|%s|%d|%s", numFulfilled, numRequired, C_TaskQuest.GetQuestTimeLeftMinutes(questID), objective or "", time(), title)
+				end
 
-			wipe(rewardsCache)
-			ScanChoices(rewardsCache, questID)
-			ScanRewards(rewardsCache)
-			ScanRewardSpells(rewardsCache, questID)
+				wipe(rewardsCache)
+				ScanChoices(rewardsCache, questID)
+				ScanRewards(rewardsCache)
+				ScanRewardSpells(rewardsCache, questID)
 
-			if #rewardsCache > 0 then
-				rewards[lastQuestIndex] = TableConcat(rewardsCache, ",")
+				if #rewardsCache > 0 then
+					rewards[lastQuestIndex] = TableConcat(rewardsCache, ",")
+				end
 			end
 		end
 	end

@@ -10,7 +10,10 @@ local options
 local DataStore, pairs, ceil, time = DataStore, pairs, ceil, time
 local GetQuestsCompleted, GetBuildInfo, GetQuestID = GetQuestsCompleted, GetBuildInfo, GetQuestID
 local C_QuestLog, C_Timer = C_QuestLog, C_Timer
-local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
+
+local isRetail = AddonFactory.isRetail
+local isForever = AddonFactory.isForever
+local isMainline = isRetail or isForever
 
 local bit64 = LibStub("LibBit64")
 
@@ -25,7 +28,7 @@ end
 -- *** Scanning functions ***
 local function GetQuestHistory_Common()
 	-- In retail, the questID is the value in the returned table
-	if isRetail then
+	if isMainline then
 		return C_QuestLog.GetAllCompletedQuestIDs()
 	end
 

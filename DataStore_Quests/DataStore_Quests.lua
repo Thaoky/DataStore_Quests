@@ -13,7 +13,8 @@ local questColors
 local questTitles
 local options
 
-local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
+local isRetail = AddonFactory.isRetail
+local isMainline = AddonFactory.isMainline
 
 local DataStore, pairs, tonumber, time, format, strsplit, TableInsert, TableConcat = DataStore, pairs, tonumber, time, format, strsplit, table.insert, table.concat
 local GetNumQuestLogEntries, GetQuestLogSelection, SelectQuestLogEntry, GetQuestLogTitle, GetQuestTagInfo = GetNumQuestLogEntries, GetQuestLogSelection, SelectQuestLogEntry, GetQuestLogTitle, GetQuestTagInfo
@@ -55,15 +56,15 @@ local emissaryQuests = {
 
 
 -- *** Common API ***
-local API_GetNumQuestLogEntries = isRetail and C_QuestLog.GetNumQuestLogEntries or GetNumQuestLogEntries
-local API_GetSelectedQuest = isRetail and C_QuestLog.GetSelectedQuest or GetQuestLogSelection
-local API_SetSelectedQuest = isRetail and C_QuestLog.SetSelectedQuest or SelectQuestLogEntry
-local API_DailyFrequency = isRetail and Enum.QuestFrequency.Daily or LE_QUEST_FREQUENCY_DAILY
-local API_WeeklyFrequency = isRetail and Enum.QuestFrequency.Weekly or LE_QUEST_FREQUENCY_WEEKLY
+local API_GetNumQuestLogEntries = isMainline and C_QuestLog.GetNumQuestLogEntries or GetNumQuestLogEntries
+local API_GetSelectedQuest = isMainline and C_QuestLog.GetSelectedQuest or GetQuestLogSelection
+local API_SetSelectedQuest = isMainline and C_QuestLog.SetSelectedQuest or SelectQuestLogEntry
+local API_DailyFrequency = isMainline and Enum.QuestFrequency.Daily or LE_QUEST_FREQUENCY_DAILY
+local API_WeeklyFrequency = isMainline and Enum.QuestFrequency.Weekly or LE_QUEST_FREQUENCY_WEEKLY
 local API_GetQuestInfo
 local API_GetQuestTagInfo
 
-if isRetail then
+if isMainline then
 	API_GetQuestInfo = function(index) 
 			local info = C_QuestLog.GetInfo(index)
 			if not info then return nil end
@@ -96,7 +97,7 @@ end
 -- *** Utility functions ***
 local function GetQuestTitle(questID)
 	-- retail
-	if isRetail then return C_QuestLog.GetTitleForQuestID(questID) end
+	if isMainline then return C_QuestLog.GetTitleForQuestID(questID) end
 	
 	-- non-retail
 	if questTitles then return questTitles[questID] end
@@ -360,7 +361,7 @@ local function ScanQuests()
 				TableInsert(headers, title or "")
 				lastHeaderIndex = lastHeaderIndex + 1
 			else
-				API_SetSelectedQuest(isRetail and questID or i)
+				API_SetSelectedQuest(isMainline and questID or i)
 				
 				local value = (isComplete and isComplete > 0) and 1 or 0		-- bit 0 : isComplete
 				value = value 
@@ -371,7 +372,7 @@ local function ScanQuests()
 				TableInsert(quests, value)
 				lastQuestIndex = lastQuestIndex + 1
 				
-				if not isRetail then
+				if not isMainline then
 					questTitles[questID] = title
 				end
 
@@ -694,7 +695,7 @@ AddonFactory:OnAddonLoaded(addonName, function()
 	thisCharacter.Emissaries = thisCharacter.Emissaries or {}
 	
 	-- Quest titles cannot be retrieved with C_QuestLog in Cataclym
-	if not isRetail then
+	if not isMainline then
 		DataStore_Quests_Titles = DataStore_Quests_Titles or {}
 		questTitles = DataStore_Quests_Titles
 	end
@@ -715,7 +716,7 @@ AddonFactory:OnPlayerLogin(function()
 	addon:ListenTo("PLAYER_ALIVE", OnPlayerAlive)
 	addon:ListenTo("UNIT_QUEST_LOG_CHANGED", OnUnitQuestLogChanged)
 	
-	if isRetail then
+	if isMainline then
 		addon:ListenTo("WORLD_QUEST_COMPLETED_BY_SPELL", ScanQuests)
 		addon:ListenTo("COVENANT_CALLINGS_UPDATED", OnCovenantCallingsUpdated)
 	

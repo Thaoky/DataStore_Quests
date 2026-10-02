@@ -683,7 +683,7 @@ AddonFactory:OnAddonLoaded(addonName, function()
 	DataStore:RegisterMethod(addon, "GetCharactersOnQuest", _GetCharactersOnQuest)
 	DataStore:RegisterMethod(addon, "GetQuestLink", _GetQuestLink)
 
-	if isRetail then
+	if isMainline then
 		DataStore:RegisterMethod(addon, "IsEmissaryQuest", _IsEmissaryQuest)
 		DataStore:RegisterMethod(addon, "GetEmissaryQuests", _GetEmissaryQuests)
 	end

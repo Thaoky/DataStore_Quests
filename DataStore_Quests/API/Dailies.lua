@@ -9,8 +9,8 @@ local options
 
 local DataStore, pairs, time, date, TableInsert, TableRemove = DataStore, pairs, time, date, table.insert, table.remove
 local C_DateAndTime, GetQuestID = C_DateAndTime, GetQuestID
-local isRetail = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE)
-local isCata = (WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC)
+local isRetail = AddonFactory.isRetail
+local isCata = AddonFactory.isCata
 
 local function InsertQuest(questID, title)
 	local charID = DataStore.ThisCharID

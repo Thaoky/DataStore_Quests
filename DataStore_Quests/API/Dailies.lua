@@ -10,6 +10,7 @@ local options
 local DataStore, pairs, time, date, TableInsert, TableRemove = DataStore, pairs, time, date, table.insert, table.remove
 local C_DateAndTime, GetQuestID = C_DateAndTime, GetQuestID
 local isRetail = AddonFactory.isRetail
+local isMainline = AddonFactory.isMainline
 local isCata = AddonFactory.isCata
 
 local function InsertQuest(questID, title)
@@ -28,7 +29,7 @@ end
 -- *** Event Handlers ***
 local function OnQuestTurnedIn(event, questID, xpReward, moneyReward)
 	local questTitle = "Unknown Quest"
-	if isRetail then
+	if isMainline then
 		questTitle = C_QuestLog.GetTitleForQuestID(questID)
 	else
 		questTitle = C_QuestLog.GetQuestInfo(questID)
@@ -120,7 +121,7 @@ hooksecurefunc("GetQuestReward", function(choiceIndex)
 	-- 2019/09/09 : questID is valid, even in Classic
 	local questID = GetQuestID() -- returns the last displayed quest dialog's questID
 
-	if options.TrackTurnIns and questID and (isRetail or isCata) then
+	if options.TrackTurnIns and questID and (isMainline or isCata) then
 
 		-- track daily quests turn-ins
 		if QuestIsDaily() or DataStore:IsEmissaryQuest(questID) then

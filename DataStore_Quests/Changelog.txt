@@ -8,6 +8,7 @@ Version 2026.10.02 (02/10/2026)
 - Updated UI version detection to support WoW Forever.
 - Updated for Altoholic Forever v1.60.002.
 - Fixed a Lua error when turning a quest in.
+- Fixed another Lua error when turning a quest in.
 
 Version 2026.09.30 (30/09/2026)
 
